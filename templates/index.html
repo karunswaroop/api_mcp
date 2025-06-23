@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Information POC</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .examples {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        .examples h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #f1f8ff;
+            border-left: 4px solid #3498db;
+            white-space: pre-line;
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3498db;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Information POC</h1>
+        
+        <div class="form-group">
+            <label for="query">Ask about the weather:</label>
+            <input type="text" id="query" name="query" placeholder="e.g., What's the weather like in Boston today?">
+        </div>
+        
+        <button id="submit-btn">Get Weather Information</button>
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Processing your query...</p>
+        </div>
+        
+        <div id="response" class="response"></div>
+        
+        <div class="examples">
+            <h3>Example Queries:</h3>
+            <ul>
+                <li>What's the current weather in New York?</li>
+                <li>Will it rain tomorrow in Seattle?</li>
+                <li>What's the 5-day forecast for Chicago?</li>
+                <li>What's the temperature and humidity in Los Angeles?</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', async function() {
+            const query = document.getElementById('query').value.trim();
+            
+            if (!query) {
+                alert('Please enter a weather query');
+                return;
+            }
+            
+            // Show loading indicator
+            document.querySelector('.loading').style.display = 'block';
+            document.getElementById('response').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading indicator
+                document.querySelector('.loading').style.display = 'none';
+                
+                // Display response
+                const responseElement = document.getElementById('response');
+                responseElement.textContent = data.response;
+                responseElement.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.querySelector('.loading').style.display = 'none';
+                
+                const responseElement = document.getElementById('response');
+                responseElement.textContent = 'An error occurred while processing your request. Please try again.';
+                responseElement.style.display = 'block';
+            }
+        });
+        
+        // Allow pressing Enter to submit
+        document.getElementById('query').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-btn').click();
+            }
+        });
+    </script>
+</body>
+</html>
