@@ -3,6 +3,7 @@ Flask web application for the Weather API POC
 """
 import os
 import json
+import traceback
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from weather_api.flow import process_weather_query
@@ -20,33 +21,25 @@ def index():
 
 @app.route('/api/weather', methods=['POST'])
 def weather_api():
-    """API endpoint to process weather queries"""
+    """API endpoint for weather queries"""
     try:
-        # Get query from request
         data = request.get_json()
-        if not data or 'query' not in data:
-            return jsonify({
-                'error': 'Missing query parameter'
-            }), 400
+        query = data.get('query', '')
+        provider = data.get('provider', 'api')  # Default to API if not specified
         
-        query = data['query']
+        if not query:
+            return jsonify({"error": "No query provided"}), 400
         
-        # Process query using PocketFlow
-        response = process_weather_query(query)
+        # Validate provider
+        if provider not in ['api', 'mcp']:
+            return jsonify({"error": "Invalid provider. Must be 'api' or 'mcp'"}), 400
         
-        # Return response
-        return jsonify({
-            'query': query,
-            'response': response
-        })
+        response = process_weather_query(query, provider)
+        
+        return jsonify({"response": response})
     except Exception as e:
-        import traceback
-        error_details = traceback.format_exc()
-        print(f"ERROR DETAILS: {error_details}")
-        return jsonify({
-            'error': str(e),
-            'details': error_details
-        }), 500
+        traceback.print_exc()  # Print detailed error for debugging
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/health')
 def health():

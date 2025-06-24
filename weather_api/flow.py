@@ -12,6 +12,7 @@ from .nodes import (
     ResponseFormatterNode,
     ErrorHandlerNode
 )
+from .mcp_nodes import MCPWeatherNode
 
 def create_weather_flow():
     """
@@ -30,6 +31,7 @@ def create_weather_flow():
     current_weather = CurrentWeatherNode()
     forecast = ForecastNode()
     historical = HistoricalWeatherNode()
+    mcp_weather = MCPWeatherNode()
     response_formatter = ResponseFormatterNode()
     error_handler = ErrorHandlerNode()
     
@@ -44,47 +46,64 @@ def create_weather_flow():
     location_resolver - "success" >> current_weather
     location_resolver - "error" >> error_handler
     
-    # Connect weather nodes based on timeframe
+    # Connect API weather nodes based on timeframe
     current_weather.next(response_formatter)
     forecast.next(response_formatter)
     historical.next(response_formatter)
     
-    # The CurrentWeatherNode now handles this logic directly in its post method
+    # Connect MCP weather node with specific actions
+    mcp_weather - "current" >> response_formatter
+    mcp_weather - "tomorrow" >> response_formatter
+    mcp_weather - "week" >> response_formatter
+    mcp_weather - "historical" >> response_formatter
+    mcp_weather - "success" >> response_formatter
+    mcp_weather - "error" >> error_handler
     
     # Add conditional transitions from current weather node
     current_weather - "forecast" >> forecast
     current_weather - "historical" >> historical
     current_weather - "done" >> response_formatter
     
-    # ForecastNode and HistoricalWeatherNode now handle this logic directly in their post methods
+    # Add conditional transitions from location resolver to MCP weather
+    # This will be used when provider is set to "mcp"
+    location_resolver - "mcp" >> mcp_weather
     
     return flow
 
-def process_weather_query(query: str) -> str:
+def process_weather_query(query: str, provider: str = "api") -> str:
     """
     Process a weather query using the PocketFlow
     
     Args:
         query: User's natural language query about weather
+        provider: Weather data provider to use ("api" or "mcp")
         
     Returns:
         Formatted response to the user's query
     """
     # Create shared context
-    shared = {"user_query": query}
+    shared = {
+        "user_query": query,
+        "provider": provider
+    }
     
     # Create flow
     flow = create_weather_flow()
     
     # Run flow
-    print(f"DEBUG: Processing query: {query}")
+    print(f"DEBUG: Processing query: {query} with provider: {provider}")
     flow.run(shared)
     
     # Print debug info
     print(f"DEBUG: Parameters: {shared.get('parameters', {})}")
+    print(f"DEBUG: Provider: {shared.get('provider', 'api')}")
     print(f"DEBUG: Current weather response: {shared.get('current_weather_response', 'None')}")
     print(f"DEBUG: Forecast response: {shared.get('forecast_response', 'None')}")
+    print(f"DEBUG: MCP weather data: {shared.get('mcp_weather', {})}")
     print(f"DEBUG: Final response: {shared.get('final_response', 'None')}")
+    print(f"DEBUG: Error message: {shared.get('error_message', 'None')}")
+    print(f"DEBUG: Error response: {shared.get('error_response', 'None')}")
+    
     
     # Return final response
     return shared.get("final_response", "Sorry, I couldn't process your weather query.")
