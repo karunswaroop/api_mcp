@@ -3,271 +3,626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Information POC</title>
+    <title>AI Weather Intelligence Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #22223b;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        }
-        h1 {
-            color: #2d3a8c;
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .container {
-            background: #fff;
-            border-radius: 14px;
-            padding: 36px 32px 32px 32px;
-            box-shadow: 0 6px 24px rgba(44, 62, 80, 0.08);
-        }
-        .form-group {
-            margin-bottom: 24px;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #3d5a80;
-            font-size: 17px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            border: 1.5px solid #bfc9d1;
-            border-radius: 6px;
-            font-size: 17px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            background: #f8fafc;
-            transition: border 0.2s;
         }
-        input[type="text"]:focus {
-            border: 1.5px solid #4361ee;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .provider-section {
+            margin-bottom: 32px;
+        }
+
+        .section-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .toggle-container {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 4px;
+            width: fit-content;
+        }
+
+        .toggle-option {
+            padding: 16px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 1.1rem;
+            user-select: none;
+        }
+
+        .toggle-option.active {
+            background: white;
+            color: #1e40af;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-option:not(.active) {
+            color: #64748b;
+        }
+
+        .query-section {
+            margin-bottom: 32px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 20px 24px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            background: white;
+            transition: all 0.2s ease;
             outline: none;
         }
-        button {
-            background: linear-gradient(90deg, #4361ee 0%, #5f6cff 100%);
-            color: #fff;
+
+        .query-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .query-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 6px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 17px;
-            font-weight: 700;
-            transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.08);
-        }
-        button:hover {
-            background: linear-gradient(90deg, #274690 0%, #4361ee 100%);
-        }
-        .examples {
-            margin-top: 32px;
-            background: #f6f8fa;
-            padding: 18px;
-            border-radius: 6px;
-            border-left: 4px solid #4361ee;
-        }
-        .examples h3 {
-            margin-top: 0;
-            color: #2d3a8c;
-        }
-        .response {
-            margin-top: 32px;
-            padding: 22px;
-            border-radius: 6px;
-            background: #f1f8ff;
-            border-left: 4px solid #4361ee;
-            white-space: pre-line;
-            display: none;
-            font-size: 17px;
-        }
-        .loading {
-            text-align: center;
+            transition: all 0.2s ease;
             margin-top: 20px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .loading-container {
             display: none;
+            text-align: center;
+            margin: 32px 0;
         }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #3b82f6;
             border-radius: 50%;
-            border-left-color: #4361ee;
             animation: spin 1s linear infinite;
-            display: inline-block;
+            margin: 0 auto 16px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .toggle-switch {
-            display: inline-block;
-            position: relative;
-            width: 180px;
-            height: 48px;
-            background: linear-gradient(90deg, #4361ee 0%, #5f6cff 100%);
-            border-radius: 24px;
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.08);
-            margin-bottom: 10px;
+
+        .loading-text {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 1.1rem;
         }
-        .toggle-label {
+
+        .response-container {
+            display: none;
+            margin-top: 32px;
+        }
+
+        .ai-answer {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .ai-answer-header {
             display: flex;
             align-items: center;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            position: relative;
-        }
-        .toggle-option {
-            flex: 1;
-            text-align: center;
-            z-index: 2;
-            font-size: 18px;
+            margin-bottom: 20px;
+            font-size: 1rem;
             font-weight: 600;
-            color: #fff;
-            transition: color 0.2s;
-            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
         }
-        .toggle-option.left.selected {
-            color: #4361ee;
+
+        .ai-answer-content {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            font-weight: 400;
         }
-        .toggle-option.right.selected {
-            color: #4361ee;
+
+        .ai-direct-answer {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fbbf24;
+            line-height: 1.7;
+            white-space: pre-line;
         }
-        .toggle-slider {
-            position: absolute;
-            left: 4px;
-            top: 4px;
-            width: 84px;
-            height: 40px;
-            background: #fff;
-            border-radius: 20px;
-            transition: left 0.2s;
-            z-index: 1;
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.10);
+
+        .ai-additional-context {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.95;
+            line-height: 1.7;
+            white-space: pre-line;
         }
-        #providerSwitch:checked + .toggle-label .toggle-slider {
-            left: 92px;
+
+        .weather-details {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
         }
-        #providerSwitch:checked + .toggle-label .toggle-option.left {
-            color: #fff;
+
+        .weather-details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
         }
-        #providerSwitch:checked + .toggle-label .toggle-option.right {
-            color: #4361ee;
+
+        .weather-details-content {
+            color: #374151;
+            white-space: pre-line;
+            line-height: 1.7;
+            font-size: 1.1rem;
         }
-        #providerSwitch:not(:checked) + .toggle-label .toggle-option.left {
-            color: #4361ee;
+
+        .examples-section {
+            margin-top: 40px;
+            padding: 32px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
         }
-        #providerSwitch:not(:checked) + .toggle-label .toggle-option.right {
-            color: #fff;
+
+        .examples-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 20px;
+        }
+
+        .examples-list {
+            list-style: none;
+        }
+
+        .examples-list li {
+            padding: 16px 20px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            margin: 4px 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+
+        .examples-list li:hover {
+            color: #3b82f6;
+            background: #f8fafc;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .examples-list li:active {
+            transform: translateY(0);
+            background: #eff6ff;
+        }
+
+        .examples-list li::before {
+            content: "▶";
+            margin-right: 12px;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+
+        .examples-list li:hover::before {
+            color: #3b82f6;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            margin-top: 16px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .header {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header p {
+                font-size: 1.1rem;
+            }
+
+            .query-input {
+                font-size: 1.1rem;
+                padding: 18px 20px;
+            }
+
+            .submit-button {
+                font-size: 1.1rem;
+                padding: 18px;
+            }
+
+            .ai-answer-content {
+                font-size: 1.2rem;
+            }
+
+            .toggle-container {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .toggle-option {
+                flex: 1;
+                text-align: center;
+                font-size: 1rem;
+                padding: 14px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>AI Agent Weather Info</h1>
-        <div class="form-group">
-            <label>End-Point Call</label>
-            <div class="toggle-switch" id="provider-toggle">
-                <input type="checkbox" id="providerSwitch" style="display:none;">
-                <label class="toggle-label" for="providerSwitch">
-                    <span class="toggle-option left" id="apiLabel">API</span>
-                    <span class="toggle-option right" id="mcpLabel">MCP</span>
-                    <span class="toggle-slider"></span>
-                </label>
+    <div class="main-container">
+        <div class="app-card">
+            <div class="header">
+                <h1>Weather Intelligence</h1>
+                <p>AI-powered weather insights with dual data providers</p>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="query">Ask about the weather:</label>
-            <input type="text" id="query" placeholder="What's the weather like in New York?">
-        </div>
-        <button id="submit-btn">Click Here - to Get Weather Information</button>
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Processing your query...</p>
-        </div>
-        <div id="response" class="response"></div>
-        <div class="examples">
-            <h3>Example Queries:</h3>
-            <ul>
-                <li>What's the current weather in New York?</li>
-                <li>Will it rain tomorrow in Seattle?</li>
-                <li>What's the 3-day forecast for Chicago?</li>
-                <li>What's the temperature and humidity in Los Angeles?</li>
-            </ul>
+
+            <div class="content">
+                <div class="provider-section">
+                    <label class="section-label">Data Provider</label>
+                    <div class="toggle-container">
+                        <div class="toggle-option active" data-provider="api">
+                            Weather API
+                        </div>
+                        <div class="toggle-option" data-provider="mcp">
+                            MCP Protocol
+                        </div>
+                    </div>
+                </div>
+
+                <div class="query-section">
+                    <label class="section-label">Ask about the weather</label>
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="weatherQuery" 
+                            class="query-input"
+                            placeholder="What's the weather like in New York?"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <button id="submitQuery" class="submit-button">
+                        Get Weather Intelligence
+                    </button>
+                </div>
+
+                <div class="loading-container" id="loadingContainer">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Analyzing weather data...</div>
+                </div>
+
+                <div class="response-container" id="responseContainer">
+                    <!-- Response will be populated here -->
+                </div>
+
+                <div class="examples-section">
+                    <div class="examples-title">Example Queries - Click to Try</div>
+                    <ul class="examples-list">
+                        <li data-query="What's the current weather in New York?">What's the current weather in New York?</li>
+                        <li data-query="Will it be cloudy tomorrow in Seattle?">Will it be cloudy tomorrow in Seattle?</li>
+                        <li data-query="What's the 3-day forecast for Chicago?">What's the 3-day forecast for Chicago?</li>
+                        <li data-query="What's the humidity level in Los Angeles?">What's the humidity level in Los Angeles?</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('submit-btn').addEventListener('click', function() {
-            const query = document.getElementById('query').value;
+        // State management
+        let currentProvider = 'api';
+
+        // DOM elements
+        const toggleOptions = document.querySelectorAll('.toggle-option');
+        const queryInput = document.getElementById('weatherQuery');
+        const submitButton = document.getElementById('submitQuery');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const responseContainer = document.getElementById('responseContainer');
+
+        // Provider toggle functionality
+        toggleOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                toggleOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentProvider = option.dataset.provider;
+            });
+        });
+
+        // Set query from examples and run it
+        function setQueryAndRun(query) {
+            queryInput.value = query;
+            queryInput.focus();
+            // Automatically submit the query
+            submitQuery();
+        }
+
+        // Submit query
+        function submitQuery() {
+            const query = queryInput.value.trim();
+            
             if (!query) {
-                alert('Please enter a weather query');
+                showError('Please enter a weather query');
                 return;
             }
-            // Get selected provider from toggle
-            const providerSwitch = document.getElementById('providerSwitch');
-            const provider = providerSwitch.checked ? 'mcp' : 'api';
-            // Show loading indicator
-            document.getElementById('response').innerHTML = 'Loading...';
-            // Send query to API
+
+            // Show loading state
+            showLoading();
+
+            // Make API request
             fetch('/api/weather', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     query: query,
-                    provider: provider
-                }),
+                    provider: currentProvider
+                })
             })
             .then(response => response.json())
             .then(data => {
+                hideLoading();
+                
                 if (data.error) {
-                    document.getElementById('response').innerHTML = `<div class="error">${data.error}</div>`;
+                    showError(data.error);
                 } else {
-                    document.getElementById('response').innerHTML = data.response;
+                    showResponse(data.response);
                 }
-                document.getElementById('response').style.display = 'block';
             })
             .catch(error => {
-                document.getElementById('response').innerHTML = `<div class="error">Error: ${error.message}</div>`;
-                document.getElementById('response').style.display = 'block';
+                hideLoading();
+                showError('Network error: ' + error.message);
             });
-        });
-        
-        // Allow pressing Enter to submit
-        document.getElementById('query').addEventListener('keypress', function(e) {
+        }
+
+        // Show loading state
+        function showLoading() {
+            loadingContainer.style.display = 'block';
+            responseContainer.style.display = 'none';
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            loadingContainer.style.display = 'none';
+            submitButton.disabled = false;
+            submitButton.textContent = 'Get Weather Intelligence';
+        }
+
+        // Format AI summary with clear division
+        function formatAiSummary(summary) {
+            // Split the summary into paragraphs
+            const paragraphs = summary.split('\n\n').filter(p => p.trim());
+            
+            if (paragraphs.length >= 2) {
+                // First paragraph is the direct answer, rest is additional context
+                const directAnswer = paragraphs[0].trim();
+                const additionalContext = paragraphs.slice(1).join('\n\n').trim();
+                
+                return `
+                    <div class="ai-direct-answer">
+                        ${directAnswer}
+                    </div>
+                    <div class="ai-additional-context">
+                        ${additionalContext}
+                    </div>
+                `;
+            } else {
+                // If no clear division, show as single content
+                return `<div class="ai-answer-content">${summary}</div>`;
+            }
+        }
+
+        // Show response
+        function showResponse(response) {
+            try {
+                const parsedResponse = JSON.parse(response);
+                
+                if (parsedResponse.ai_summary && parsedResponse.weather_data) {
+                    const formattedSummary = formatAiSummary(parsedResponse.ai_summary);
+                    
+                    responseContainer.innerHTML = `
+                        <div class="ai-answer">
+                            <div class="ai-answer-header">
+                                🤖 AI Answer
+                            </div>
+                            ${formattedSummary}
+                        </div>
+                        <div class="weather-details">
+                            <div class="weather-details-header">
+                                📊 Detailed Weather Information
+                            </div>
+                            <div class="weather-details-content">
+                                ${parsedResponse.weather_data}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    responseContainer.innerHTML = `
+                        <div class="weather-details">
+                            <div class="weather-details-header">
+                                🌤️ Weather Information
+                            </div>
+                            <div class="weather-details-content">
+                                ${response}
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                responseContainer.innerHTML = `
+                    <div class="weather-details">
+                        <div class="weather-details-header">
+                            🌤️ Weather Information
+                        </div>
+                        <div class="weather-details-content">
+                            ${response}
+                        </div>
+                    </div>
+                `;
+            }
+
+            responseContainer.style.display = 'block';
+        }
+
+        // Show error
+        function showError(message) {
+            responseContainer.innerHTML = `
+                <div class="error-message">
+                    ⚠️ ${message}
+                </div>
+            `;
+            responseContainer.style.display = 'block';
+        }
+
+        // Event listeners
+        submitButton.addEventListener('click', submitQuery);
+
+        queryInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                document.getElementById('submit-btn').click();
+                submitQuery();
             }
         });
 
-        // Provider toggle logic
+        // Add click listeners to example queries
         document.addEventListener('DOMContentLoaded', function() {
-            const providerSwitch = document.getElementById('providerSwitch');
-            const apiLabel = document.getElementById('apiLabel');
-            const mcpLabel = document.getElementById('mcpLabel');
-            // Set initial state
-            providerSwitch.checked = false;
-            apiLabel.classList.add('selected');
-            mcpLabel.classList.remove('selected');
-            // Update label color on toggle
-            providerSwitch.addEventListener('change', function() {
-                if (providerSwitch.checked) {
-                    apiLabel.classList.remove('selected');
-                    mcpLabel.classList.add('selected');
-                } else {
-                    apiLabel.classList.add('selected');
-                    mcpLabel.classList.remove('selected');
-                }
+            const exampleItems = document.querySelectorAll('.examples-list li[data-query]');
+            exampleItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const query = this.getAttribute('data-query');
+                    setQueryAndRun(query);
+                });
             });
         });
+
+        // Focus input on load
+        queryInput.focus();
     </script>
 </body>
 </html>

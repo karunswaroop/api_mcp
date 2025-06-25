@@ -13,6 +13,7 @@ from .nodes import (
     ErrorHandlerNode
 )
 from .mcp_nodes import MCPWeatherNode
+from .ai_summary_node import AISummaryNode
 
 def create_weather_flow():
     """
@@ -33,6 +34,7 @@ def create_weather_flow():
     historical = HistoricalWeatherNode()
     mcp_weather = MCPWeatherNode()
     response_formatter = ResponseFormatterNode()
+    ai_summary = AISummaryNode()
     error_handler = ErrorHandlerNode()
     
     # Connect nodes
@@ -50,6 +52,9 @@ def create_weather_flow():
     current_weather.next(response_formatter)
     forecast.next(response_formatter)
     historical.next(response_formatter)
+    
+    # Connect response formatter to AI summary
+    response_formatter.next(ai_summary)
     
     # Connect MCP weather node with specific actions
     mcp_weather - "current" >> response_formatter
@@ -101,6 +106,7 @@ def process_weather_query(query: str, provider: str = "api") -> str:
     print(f"DEBUG: Forecast response: {shared.get('forecast_response', 'None')}")
     print(f"DEBUG: MCP weather data: {shared.get('mcp_weather', {})}")
     print(f"DEBUG: Final response: {shared.get('final_response', 'None')}")
+    print(f"DEBUG: AI summary: {shared.get('ai_summary', 'None')}")
     print(f"DEBUG: Error message: {shared.get('error_message', 'None')}")
     print(f"DEBUG: Error response: {shared.get('error_response', 'None')}")
     
